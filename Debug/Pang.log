@@ -1,4 +1,7 @@
 ﻿cl : Línea de comandos warning D9035: La opción 'Gm' está desusada y se quitará en próximas versiones
   Pang.cpp
+c:\users\samuel\desktop\informatica industrial\lab samu\laboratorio 1\pang lab 1\pang.cpp(10): warning C4091: 'typedef ': se ha omitido a la izquierda de 'Esfera' cuando no hay ninguna variable declarada
+c:\users\samuel\desktop\informatica industrial\lab samu\laboratorio 1\pang lab 1\pang.cpp(23): warning C4091: 'typedef ': se ha omitido a la izquierda de 'Mundo' cuando no hay ninguna variable declarada
+c:\users\samuel\desktop\informatica industrial\lab samu\laboratorio 1\pang lab 1\pang.cpp(107): warning C4553: "==": el resultado de la expresión no se usa. ¿Quiso decir "="?
 Pang.obj : warning LNK4075: se omite '/EDITANDCONTINUE' debido a la especificación '/INCREMENTAL:NO'
-  Pang.vcxproj -> C:\Users\Samuel\Desktop\LAB SAMU\Tema2inicial2012\.\Debug\Pang.exe
+  Pang.vcxproj -> C:\Users\Samuel\Desktop\INFORMATICA INDUSTRIAL\Lab Samu\Laboratorio 1\PANG LAB 1\.\Debug\Pang.exe

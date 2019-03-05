@@ -1,14 +1,28 @@
 #include "glut.h"
-typedef struct _Esfera { 
+#include <math.h>
+typedef struct Esfera { 
 	float radio;  
 	float x;  
 	float y;  
 	unsigned char rojo; 
 	unsigned char verde;  
 	unsigned char azul; 
-} Esfera;
-Esfera esfera = { 1,0,0,255,255,255 };
-Esfera esfera2 = { 0,0,3,0,255,255 };
+};
+Esfera esfera = { 1,0,2,50,150,200 };
+Esfera esfera2 = { 0,-3,0,255,50,255 };
+typedef struct Mundo {
+	float ojo_x;
+	float ojo_y;
+	float ojo_z;
+	float mira_x;
+	float mira_y;
+	float mira_z;
+	float eje_x;
+	float eje_y;
+	float eje_z;
+};
+Mundo mundo = { 10, 10, 20, 0, 0, 0, 0, 1, 0 };
+void Camara(Mundo *);
 //los callback, funciones que seran llamadas automaticamente por la glut
 //cuando sucedan eventos
 //NO HACE FALTA LLAMARLAS EXPLICITAMENTE
@@ -59,24 +73,24 @@ void OnDraw(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	gluLookAt(0, 20, 30,  // posicion del ojo
-		0.0, 0, 0.0,      // hacia que punto mira  (0,0,0) 
-		0.0, 1.0, 0.0);      // definimos hacia arriba (eje Y)    
-
+	gluLookAt(mundo.ojo_x, mundo.ojo_y, mundo.ojo_z,  // posicion del ojo
+		mundo.mira_x, mundo.mira_y, mundo.mira_z,      // hacia que punto mira  (0,0,0) 
+		mundo.eje_x, mundo.eje_y, mundo.eje_z);      // definimos hacia arriba (eje Y)    
+	   
 	Dibuja(esfera); 
 	Dibuja(esfera2);
 	glColor3ub(0, 255, 0);
 	glutSolidTorus(1, 5, 50, 50);
 	glDisable(GL_LIGHTING);
 	glBegin(GL_POLYGON);
-	glColor3ub(255, 255, 0); 
-	glVertex3f(-5.0f, 0.0f, -5.0f);
-	glColor3ub(255, 255, 0); 
-	glVertex3f(-5.0f, 0.0f, 5.0f); 
-	glColor3ub(255, 0, 0); 
-	glVertex3f(5.0f, 0.0f, 5.0f); 
-	glColor3ub(255, 0, 0); 
-	glVertex3f(5.0f, 0.0f, -5.0f);
+		glColor3ub(255, 255, 0); 
+		glVertex3f(-5.0f, 0.0f, -5.0f);
+		glColor3ub(255, 255, 0); 
+		glVertex3f(-5.0f, 0.0f, 5.0f); 
+		glColor3ub(255, 0, 0); 
+		glVertex3f(5.0f, 0.0f, 5.0f); 
+		glColor3ub(255, 0, 0); 
+		glVertex3f(5.0f, 0.0f, -5.0f);
 	glEnd();
 	glEnable(GL_LIGHTING);
 	//no borrar esta linea ni poner nada despues
@@ -85,14 +99,45 @@ void OnDraw(void)
 void OnKeyboardDown(unsigned char key, int x_t, int y_t)
 {
 	if (key == '+' && esfera.radio < 3)  
-		esfera.radio += 0.5f; 
+		esfera.radio += 0.2f; 
 	if (key == '-' && esfera.radio > 1) 
-		esfera.radio -= 0.5f;  
-	if (key == 'r') {
-		esfera.rojo = 255;   
-		esfera.verde = 0;   
-		esfera.azul = 0;
-	}  
+		esfera.radio -= 0.2f;  
+	if (key == 'z') {
+		if (esfera.rojo >= 245) {
+			esfera.rojo == 254;}
+		else {
+			esfera.rojo += 10;}
+	}
+	if (key == 'x') {
+		if (esfera.verde >= 245) {
+			esfera.verde = 254;}
+		else {
+			esfera.verde += 10;}
+	}
+	if (key == 'c') {
+		if (esfera.azul >= 245) {
+			esfera.azul = 254;}
+		else {
+			esfera.azul += 10;}
+	}
+	if (key == 'v') {
+		if (esfera.rojo <= 11) {
+			esfera.rojo = 0;}
+		else {
+			esfera.rojo -= 10;}
+	}
+	if (key == 'b') {
+		if (esfera.verde <= 11) {
+			esfera.verde = 0;}
+		else {
+			esfera.verde -= 10;}
+	}
+	if (key == 'n') {
+		if (esfera.azul <= 11) {
+			esfera.azul = 0;}
+		else {
+			esfera.azul -= 10;}
+	}
 	if (key == 'a')  
 		esfera.x -= 0.1f;
 	if (key == 'd')  
@@ -101,7 +146,7 @@ void OnKeyboardDown(unsigned char key, int x_t, int y_t)
 		esfera.y -= 0.1f;  
 	if (key == 'w')   
 		esfera.y += 0.1f;
-		glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 void OnTimer(int value)
@@ -109,13 +154,26 @@ void OnTimer(int value)
 	//poner aqui el código de animacion  
 	//Mueve(&esfera);  
 	Mueve(&esfera2);
+	Camara(&mundo);
 	//no borrar estas lineas  
 	glutTimerFunc(25,OnTimer,0);  
 	glutPostRedisplay();
 }
 void Mueve(Esfera* e) { 
-	e->radio += 0.1f; 
-	e->azul += 10;
+	e->radio += 0.02f; 
+	e->rojo += 10;
 	if (e->radio > 3)  
 		e->radio = 0.5f; 
+}
+void Camara(Mundo *a) {
+
+	//Calculamos la distancia
+	float d, theta;
+	d = sqrt(600.0f); //sqrt(10*10+10*10+20*20)
+	//Calculamos angulo plano xz
+	theta = atan2(a->ojo_x, a->ojo_z);
+	theta += 0.02f;
+	//Volvemos a las coordenadas tras el aumento
+	a->ojo_z = d * cos(theta);
+	a->ojo_x = d * sin(theta);
 }
